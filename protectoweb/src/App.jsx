@@ -6,7 +6,7 @@ import LoginModal from "./components/LoginModal";
 import Home from "./pages/Home";
 import Nosotros from "./pages/Nosotros";
 import TyC from "./pages/TyC";
-import StreamerPage from "./pages/StreamerPage"; // Importar StreamerPage
+import StreamerPage from "./pages/StreamerPage";
 import ViewerPage from "./pages/ViewerPage";
 import RegisterPage from "./pages/RegisterPage";
 import ComprarMonedas from './pages/ComprarMonedas';
@@ -21,25 +21,42 @@ export default function App() {
   const [monedas, setMonedas] = useState(100); 
   const navigate = useNavigate();
 
-  const handleLogin = (email, password) => {
-    if (email === "streamer@streamoria.com" && password === "1234") {
-      setIsLoggedIn(true);
-      setUserRole("streamer");
-      setShowLogin(false);
-      navigate("/streamer"); // Redirigir al dashboard del streamer
-    } else if (email === "viewer@streamoria.com" && password === "1234") {
-      setIsLoggedIn(true);
-      setUserRole("viewer");
-      setShowLogin(false);
-      navigate('/');
-    } else {
-      console.error("Credenciales incorrectas");
+  // 🔹 Nuevo handleLogin que llama al backend
+  const handleLogin = async (email, password) => {
+    try {
+      const res = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("rol", data.user.rol); // Guardar rol
+        setIsLoggedIn(true);
+        setUserRole(data.user.rol);
+        setShowLogin(false);
+        alert("Login correcto 🎉");
+
+        // Redirige según rol
+        if (data.user.rol === 'streamer') navigate("/streamer");
+        else navigate('/');
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error en el login");
     }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserRole(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol");
     navigate("/");
   };
 
@@ -70,17 +87,15 @@ export default function App() {
 
           {/* Rutas protegidas para el streamer */}
           {isLoggedIn && userRole === 'streamer' && (
-            // Agrega aquí todas las sub-rutas si las implementas en el futuro
             <Route path="/streamer/*" element={<StreamerPage />} /> 
           )}
+
+          {/* Rutas protegidas para el viewer */}
           {isLoggedIn && userRole === 'viewer' && (
             <>
-            <Route
-              path="/viewer/:canal"
-              element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />}
-            />
-             <Route path="/recargar" element={<RecargarMonedas />} />
-             </>
+              <Route path="/viewer/:canal" element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />} />
+              <Route path="/recargar" element={<RecargarMonedas />} />
+            </>
           )}
         </Routes>
       </main>
