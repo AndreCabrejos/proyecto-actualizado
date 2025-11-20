@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "nombre": "LunaGamer",
+        "categoria": "Just Chatting",
+        "viewers": 1530,
+        "imagen": "/images/canal1.jpg"
+    },
+    {
+        "id": 2,
+        "nombre": "RyuPlayer",
+        "categoria": "Valorant",
+        "viewers": 45200,
+        "imagen": "/images/canal2.jpg"
+    },
+    {
+        "id": 3,
+        "nombre": "ChefLoco",
+        "categoria": "Food and Vegetables",
+        "viewers": 9280,
+        "imagen": "/images/canal3.jpg"
+    },
+    {
+        "id": 4,
+        "nombre": "TechMaster",
+        "categoria": "Coding",
+        "viewers": 301,
+        "imagen": "/images/canal4.jpg"
+    }
+]

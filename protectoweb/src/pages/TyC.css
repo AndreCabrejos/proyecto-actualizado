@@ -1,0 +1,118 @@
+
+
+.page {
+  box-sizing: border-box;
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 32px;
+  background: #121212; 
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(120, 90, 200, 0.2);
+  font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #e4e0f0; 
+  line-height: 1.7;
+  text-align: left; 
+}
+
+/* Titulares */
+.page h2 {
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+  color: #c7a7ff; 
+  font-weight: 700;
+  text-align: left;
+}
+
+.page h3 {
+  font-size: 1.1rem;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: #b48cff;
+  font-weight: 600;
+  text-align: left;
+}
+
+
+.page p {
+  margin: 10px 0;
+  font-size: 1rem;
+  color: #d8d3e3;
+  text-align: left;
+}
+
+.page ul {
+  padding-left: 1.4rem;
+  margin: 8px 0 12px 0;
+  list-style: disc;
+}
+
+.page li {
+  margin: 6px 0;
+  font-size: 0.98rem;
+  color: #d8d3e3;
+  text-align: left;
+}
+
+
+.page strong {
+  color: #cba4ff;
+  font-weight: 700;
+}
+
+.page button {
+  display: inline-block;
+  margin-top: 28px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #b388ff, #7c4dff);
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 0 14px rgba(140, 90, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.page button:hover {
+  background: linear-gradient(135deg, #c19bff, #916bff);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(180, 120, 255, 0.55);
+}
+
+.page button:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+
+.page .scrollable {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.page::-webkit-scrollbar {
+  width: 8px;
+}
+.page::-webkit-scrollbar-thumb {
+  background-color: #6f45ff;
+  border-radius: 10px;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .page {
+    margin: 24px;
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .page h2 {
+    font-size: 1.4rem;
+  }
+
+  .page h3 {
+    font-size: 1rem;
+  }
+}

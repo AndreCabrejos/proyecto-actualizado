@@ -1,0 +1,273 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Contenedor principal del modal */
+.payment-modal {
+  background: #202020;
+  color: #fff;
+  width: 420px;
+  border-radius: 10px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease-in-out;
+  border: 1px solid #2f2f2f;
+}
+
+/* Botón de cierre (X) */
+.close-btn {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #bbb;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close-btn:hover {
+  color: #fff;
+}
+
+/* Cabecera del modal */
+.payment-header {
+  background: linear-gradient(90deg, #6a0dad, #b47cff);
+  text-align: center;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Cuerpo principal */
+.payment-body {
+  padding: 20px;
+}
+
+/* Campo de importe */
+.payment-amount {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.payment-amount span {
+  display: block;
+  color: #bbb;
+  margin-bottom: 5px;
+}
+
+.payment-amount input {
+  width: 60%;
+  background: #181818;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  font-size: 16px;
+  outline: none;
+}
+
+.payment-amount input:focus {
+  border-color: #b47cff;
+}
+
+/* Subtítulo */
+.payment-body h3 {
+  text-align: center;
+  color: #b47cff;
+  margin-bottom: 15px;
+}
+
+/* Formularios */
+.payment-form label {
+  display: block;
+  font-size: 14px;
+  color: #ccc;
+  margin-top: 10px;
+}
+
+.payment-form input {
+  width: 100%;
+  background: #181818;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 5px;
+  font-size: 14px;
+  outline: none;
+}
+
+.payment-form input:focus {
+  border-color: #b47cff;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Botones */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.pay-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+}
+
+.cancel-btn {
+  background: #333;
+  color: #ccc;
+  margin-right: 10px;
+}
+
+.cancel-btn:hover {
+  background: #444;
+  color: #fff;
+  transform: scale(1.02);
+}
+
+.pay-btn {
+  background: #b47cff;
+  color: white;
+}
+
+.pay-btn:hover {
+  background: #9f5cf6;
+  transform: scale(1.02);
+}
+
+/* ✅ Pie con logos de tarjetas */
+.payment-footer {
+  margin-top: 18px;
+  text-align: center;
+  background: #f2f2f2;
+  padding: 12px 0;
+  border-top: 1px solid #333;
+  border-radius: 0 0 10px 10px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Fondo claro individual para cada logo */
+.payment-footer img {
+  height: 30px;
+  width: auto;
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  opacity: 0.9;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Corrección visual para logos oscuros o con texto */
+.payment-footer img[src*="visa"],
+.payment-footer img[src*="amex"],
+.payment-footer img[src*="american"],
+.payment-footer img[src*="securecode"] {
+  filter: brightness(1.1) contrast(1.2) saturate(1.2);
+}
+
+/* Efecto hover */
+.payment-footer img:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Resultado del pago */
+.recargar-result {
+  padding: 30px;
+  text-align: center;
+}
+
+.recargar-result h3 {
+  color: #22c55e;
+  margin-bottom: 15px;
+}
+
+.recargar-result p {
+  margin: 6px 0;
+  color: #ccc;
+}
+
+/* 🔄 Animación de carga (mismo esquema oscuro) */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+}
+
+.spinner {
+  border: 4px solid #333;
+  border-top: 4px solid #b47cff;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+.loading-container p {
+  color: #b47cff;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .payment-modal {
+    width: 90%;
+  }
+  .payment-amount input {
+    width: 80%;
+  }
+}
