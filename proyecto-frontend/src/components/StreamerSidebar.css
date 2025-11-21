@@ -1,0 +1,138 @@
+.streamer-sidebar {
+  width: 70px; /* Ancho inicial reducido */
+  background-color: #1a1a1a;
+  color: #a0a0a0;
+  padding: 1rem 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease; /* Transición para expandir */
+  overflow: hidden; /* Oculta el texto cuando está contraído */
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 60px); /* Ajusta a la altura del viewport menos el header */
+}
+
+.streamer-sidebar:hover {
+  width: 200px; /* Ancho expandido al pasar el ratón */
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+  color: #fff;
+}
+
+.sidebar-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap; /* Evita que el texto se rompa */
+  opacity: 0; /* Oculto por defecto */
+  transition: opacity 0.3s ease;
+}
+
+.streamer-sidebar:hover .sidebar-title {
+  opacity: 1; /* Visible al expandir */
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  color: #a0a0a0;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 4px;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+  background-color: #3a3a3a;
+  color: #fff;
+}
+
+.sidebar-nav a svg {
+  margin-right: 1rem; /* Espacio para el icono */
+  font-size: 1.2rem;
+  flex-shrink: 0; /* Evita que el icono se encoja */
+}
+
+.sidebar-nav a span {
+  white-space: nowrap; /* Evita que el texto se rompa */
+  opacity: 0; /* Oculto por defecto */
+  transition: opacity 0.3s ease;
+}
+
+.streamer-sidebar:hover .sidebar-nav a span {
+  opacity: 1; /* Visible al expandir */
+}
+
+/* Estilos para dropdowns */
+.nav-dropdown > a {
+  position: relative;
+}
+
+.nav-dropdown .dropdown-arrow {
+  margin-left: auto; /* Empuja la flecha a la derecha */
+  border: solid #a0a0a0;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  transition: transform 0.3s ease;
+  opacity: 0; /* Oculto por defecto */
+}
+
+.streamer-sidebar:hover .nav-dropdown .dropdown-arrow {
+  opacity: 1;
+}
+
+.nav-dropdown.open > a .dropdown-arrow {
+  transform: rotate(-135deg);
+}
+
+.dropdown-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: #2a2a2a; /* Fondo para el submenú */
+  border-radius: 0 0 4px 4px;
+}
+
+.nav-dropdown.open .dropdown-menu {
+  max-height: 150px; /* Altura suficiente para mostrar los elementos */
+}
+
+.dropdown-menu li a {
+  padding-left: 3.5rem; /* Indentación para sub-elementos */
+  font-size: 0.95rem;
+  color: #808080;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #4a4a4a;
+  color: #fff;
+}

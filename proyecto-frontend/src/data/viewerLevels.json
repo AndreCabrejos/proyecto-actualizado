@@ -1,0 +1,7 @@
+[
+  { "nivel": 1, "puntos_requeridos": 0 },
+  { "nivel": 2, "puntos_requeridos": 100 },
+  { "nivel": 3, "puntos_requeridos": 300 },
+  { "nivel": 4, "puntos_requeridos": 600 },
+  { "nivel": 5, "puntos_requeridos": 1000 }
+]
