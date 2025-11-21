@@ -1,4 +1,5 @@
-import { useState } from "react";
+// src/App.jsx
+import { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -18,13 +19,24 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [showRecargarModal, setShowRecargarModal] = useState(false);
-  const [monedas, setMonedas] = useState(100); 
+  const [monedas, setMonedas] = useState(100);
   const navigate = useNavigate();
 
-  // 🔹 Nuevo handleLogin que llama al backend
+  // Leer token y role al cargar
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (token && role) {
+      setIsLoggedIn(true);
+      setUserRole(role);
+    }
+  }, []);
+
+  // Login con backend
   const handleLogin = async (email, password) => {
     try {
-      const res = await fetch("http://localhost:3001/auth/login", {
+      const res = await fetch("http://localhost:3001/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -34,15 +46,16 @@ export default function App() {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("rol", data.user.rol); // Guardar rol
+        localStorage.setItem("role", data.user.role);
+
         setIsLoggedIn(true);
-        setUserRole(data.user.rol);
+        setUserRole(data.user.role);
         setShowLogin(false);
+
         alert("Login correcto 🎉");
 
-        // Redirige según rol
-        if (data.user.rol === 'streamer') navigate("/streamer");
-        else navigate('/');
+        if (data.user.role === "streamer") navigate("/streamer");
+        else navigate("/");
       } else {
         alert(data.error);
       }
@@ -56,7 +69,7 @@ export default function App() {
     setIsLoggedIn(false);
     setUserRole(null);
     localStorage.removeItem("token");
-    localStorage.removeItem("rol");
+    localStorage.removeItem("role");
     navigate("/");
   };
 
@@ -68,29 +81,29 @@ export default function App() {
     <>
       <Header
         isLoggedIn={isLoggedIn}
-        userRole={userRole} 
+        userRole={userRole}
         onLoginClick={() => setShowLogin(true)}
         onLogoutClick={handleLogout}
         monedas={monedas}
-        onRecargarClick={() => setShowRecargarModal(true)} 
+        onRecargarClick={() => setShowRecargarModal(true)}
       />
 
       <main>
         <Routes>
-          <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/" element={<Home />} />
+          <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/tyc" element={<TyC />} />
-          
-          <Route path="/register" element={<RegisterPage />} /> 
+
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/comprar" element={<ComprarMonedas onBuy={manejarCompraMonedas} />} />
 
-          {/* Rutas protegidas para el streamer */}
+          {/* Rutas de streamer */}
           {isLoggedIn && userRole === 'streamer' && (
-            <Route path="/streamer/*" element={<StreamerPage />} /> 
+            <Route path="/streamer/*" element={<StreamerPage />} />
           )}
 
-          {/* Rutas protegidas para el viewer */}
+          {/* Rutas de viewer */}
           {isLoggedIn && userRole === 'viewer' && (
             <>
               <Route path="/viewer/:canal" element={<ViewerPage monedas={monedas} setMonedas={setMonedas} />} />
@@ -107,10 +120,10 @@ export default function App() {
       )}
 
       {showRecargarModal && (
-        <RecargarMonedas 
-          monedas={monedas} 
-          setMonedas={setMonedas} 
-          onClose={() => setShowRecargarModal(false)} 
+        <RecargarMonedas
+          monedas={monedas}
+          setMonedas={setMonedas}
+          onClose={() => setShowRecargarModal(false)}
         />
       )}
     </>

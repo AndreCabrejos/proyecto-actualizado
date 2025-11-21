@@ -1,24 +1,22 @@
-var express = require('express');
-var cookieParser = require('cookie-parser');
+// app.js
+const express = require('express');
+const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 require('dotenv').config();
 
-var authRoutes = require('./routes/authRoutes');
-var userRoutes = require('./routes/userRoutes');
+const app = express();
 
-var cors = require('cors');
-var app = express();
-
-// 🔹 CORS configurado
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
 }));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
+app.get('/', (req, res) => res.json({ msg: 'API protectoweb ok' }));
 
 module.exports = app;
