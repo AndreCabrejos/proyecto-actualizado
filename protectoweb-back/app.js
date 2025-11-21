@@ -1,21 +1,22 @@
 const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-require('dotenv').config();
+
+const indexRouter = require('./routes/index');
+const apiRouter = require('./routes/api'); // 👈 nuevo
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}));
-app.use(express.json());
+app.use(cors());               // permitir peticiones desde tu front (http://localhost:5173 por ej.)
+app.use(logger('dev'));
+app.use(express.json());       // 👈 importante para leer JSON del body
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-
-app.get('/', (req, res) => res.json({ msg: 'API protectoweb ok' }));
+app.use('/', indexRouter);
+app.use('/api', apiRouter);    // 👈 aquí montas tus endpoints: /api/login, /api/canales, etc.
 
 module.exports = app;
