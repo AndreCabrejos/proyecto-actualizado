@@ -1,4 +1,3 @@
-// controllers/authController.js
 const { User } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -18,12 +17,7 @@ exports.register = async (req, res) => {
 
     const safe = { id: user.id, nombre: user.nombre, email: user.email, role: user.role };
 
-    // Generar token para login inmediato si se quiere
-    const token = jwt.sign(
-      { id: user.id, role: user.role, nombre: user.nombre },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = jwt.sign({ id: user.id, role: user.role, nombre: user.nombre }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     return res.json({ message: 'Usuario registrado', user: safe, token });
   } catch (err) {
@@ -41,11 +35,7 @@ exports.login = async (req, res) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(400).json({ error: 'Contraseña incorrecta' });
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role, nombre: user.nombre },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = jwt.sign({ id: user.id, role: user.role, nombre: user.nombre }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     return res.json({
       message: 'Login correcto',
