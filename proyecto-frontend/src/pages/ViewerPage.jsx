@@ -5,8 +5,6 @@ import CanalesRecomendados from "../components/CanalesRecomendados";
 import Regalos from "../components/Regalos";
 import Notificacion from "../components/Notificacion";
 import mensajesData from "../data/mensajes.json";
-import canalesData from "../data/canales.json";
-import viewerLevelsData from "../data/viewerLevels.json";
 import { emitGiftEvent } from "../services/streamEvents";
 import "./ViewerPage.css";
 
@@ -15,15 +13,14 @@ export default function ViewerPage({
   setMonedas,
   currentUserEmail,
   currentUserName,
+  currentUserId,
 }) {
-  // clave para guardar stats por usuario
   const statsKey = currentUserEmail
     ? `viewerStats_${currentUserEmail}`
     : "viewerStats";
 
   const { canal } = useParams();
 
-  // nombre que se muestra en el chat
   const displayName = currentUserName || "Tú";
 
   const [nivel, setNivel] = useState(() => {
@@ -51,23 +48,40 @@ export default function ViewerPage({
   const [showNotif, setShowNotif] = useState(false);
   const [mensajeNotif, setMensajeNotif] = useState("");
 
-  const [canalSeleccionado, setCanalSeleccionado] = useState(() => {
-    return (
-      canalesData.find(
-        (c) => c.nombre.toLowerCase() === canal.toLowerCase()
-      ) || canalesData[0]
-    );
-  });
+  const [canales, setCanales] = useState([]);
+  const [canalSeleccionado, setCanalSeleccionado] = useState(null);
 
   const [mostrarRegalos, setMostrarRegalos] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [mensajes, setMensajes] = useState(mensajesData);
   const mensajesRef = useRef(null);
 
-  const [viewerLevels] = useState(() => {
-    const saved = localStorage.getItem("viewerLevels");
-    return saved ? JSON.parse(saved) : viewerLevelsData;
-  });
+  const [viewerLevels, setViewerLevels] = useState([]);
+
+  // cargar canales desde backend
+  useEffect(() => {
+    fetch("http://localhost:3001/api/canales")
+      .then((res) => res.json())
+      .then((data) => {
+        setCanales(data);
+        const encontrado =
+          data.find(
+            (c) => c.nombre.toLowerCase() === canal.toLowerCase()
+          ) || data[0] || null;
+        setCanalSeleccionado(encontrado);
+      })
+      .catch((err) => console.error("Error cargando canales:", err));
+  }, [canal]);
+
+
+  // cargar niveles desde backend
+  useEffect(() => {
+    fetch("http://localhost:3001/api/viewer-levels")
+      .then((res) => res.json())
+      .then((data) => setViewerLevels(data))
+      .catch((err) => console.error("Error cargando viewerLevels:", err));
+  }, []);
+
 
   // recargar stats cuando cambia de usuario
   useEffect(() => {
@@ -86,14 +100,6 @@ export default function ViewerPage({
       setPuntos(0);
     }
   }, [statsKey]);
-
-  // actualizar canal por URL
-  useEffect(() => {
-    const encontrado = canalesData.find(
-      (c) => c.nombre.toLowerCase() === canal.toLowerCase()
-    );
-    if (encontrado) setCanalSeleccionado(encontrado);
-  }, [canal]);
 
   // scroll automático del chat
   useEffect(() => {
@@ -123,7 +129,7 @@ export default function ViewerPage({
     return () => clearTimeout(timer);
   }, [showNotif]);
 
-  // guardar stats y avisar (Header / otros)
+  // guardar stats
   useEffect(() => {
     const payload = { nivel, puntos, email: currentUserEmail || null };
     localStorage.setItem(statsKey, JSON.stringify(payload));
@@ -133,22 +139,29 @@ export default function ViewerPage({
     );
   }, [nivel, puntos, statsKey, currentUserEmail]);
 
-  // enviar regalo: resta monedas, suma puntos y avisa al streamer
+  // enviar regalo: resta monedas (frontend + backend) y suma puntos
   const handleEnviarRegalo = (regalo) => {
-    // actualizar monedas y puntos en el cliente
     setMonedas((prev) => prev - regalo.costo);
     setPuntos((prev) => prev + (regalo.puntos || 0));
 
-    // 🔹 emitir evento de regalo (modo demo)
+    // actualizar backend (monedas)
+    if (currentUserId) {
+      fetch(`http://localhost:3001/api/users/${currentUserId}/monedas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ delta: -regalo.costo }),
+      }).catch((err) => console.error("Error actualizando monedas:", err));
+    }
+
+
     emitGiftEvent({
-      canal: canalSeleccionado.nombre,
+      canal: canalSeleccionado?.nombre || "",
       user: displayName,
       regalo,
     });
   };
 
-
-  // enviar mensaje: +1 punto y evento para vista del streamer
+  // enviar mensaje: +1 punto
   const handleEnviarMensaje = (e) => {
     e.preventDefault();
     if (!mensaje.trim()) return;
@@ -164,16 +177,18 @@ export default function ViewerPage({
     setMensaje("");
     setPuntos((prev) => prev + 1);
 
-    window.dispatchEvent(
-      new CustomEvent("streamChatMessage", {
-        detail: {
-          canal: canalSeleccionado.nombre,
-          user: displayName,
-          nivel,
-          texto: mensaje,
-        },
-      })
-    );
+    if (canalSeleccionado) {
+      window.dispatchEvent(
+        new CustomEvent("streamChatMessage", {
+          detail: {
+            canal: canalSeleccionado.nombre,
+            user: displayName,
+            nivel,
+            texto: mensaje,
+          },
+        })
+      );
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -194,10 +209,13 @@ export default function ViewerPage({
     ? Math.min((puntos / nextConfig.puntos_requeridos) * 100, 100)
     : 100;
 
+  if (!canalSeleccionado) {
+    return <div className="viewer-layout">Cargando canal...</div>;
+  }
+
   return (
     <div className="viewer-layout">
       <aside className="viewer-canales">
-        {/* Aquí sabemos que ya es viewer logueado */}
         <CanalesRecomendados isLoggedIn={true} userRole="viewer" />
       </aside>
 
@@ -263,7 +281,6 @@ export default function ViewerPage({
 
         <div className="chat-footer">
           <div className="puntos">
-            {/* Fila: icono + número */}
             <div className="puntos-row">
               <img
                 src="/images/puntos.png"
@@ -273,7 +290,6 @@ export default function ViewerPage({
               <span className="puntos-valor">{formatNumber(puntos)}</span>
             </div>
 
-            {/* Barra + texto debajo */}
             {nextConfig && (
               <>
                 <div className="mini-barra-progreso">
@@ -297,7 +313,6 @@ export default function ViewerPage({
             🏪
           </button>
         </div>
-
 
         {mostrarRegalos && (
           <Regalos

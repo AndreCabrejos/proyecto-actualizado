@@ -1,10 +1,8 @@
 // src/pages/PerfilPage.jsx
-import React, { useState } from "react";
-import viewerLevelsData from "../data/viewerLevels.json";
+import React, { useState, useEffect } from "react";
 import "./PerfilPage.css";
 
 export default function PerfilPage({ currentUserEmail, currentUserName }) {
-  // misma clave que en ViewerPage
   const statsKey = currentUserEmail
     ? `viewerStats_${currentUserEmail}`
     : "viewerStats";
@@ -18,10 +16,15 @@ export default function PerfilPage({ currentUserEmail, currentUserName }) {
     }
   });
 
-  const [viewerLevels] = useState(() => {
-    const saved = localStorage.getItem("viewerLevels");
-    return saved ? JSON.parse(saved) : viewerLevelsData;
-  });
+  const [viewerLevels, setViewerLevels] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/api/viewer-levels")
+      .then((res) => res.json())
+      .then((data) => setViewerLevels(data))
+      .catch((err) => console.error("Error cargando viewerLevels:", err));
+  }, []);
+
 
   const nivelActual =
     viewerStats.nivel && viewerStats.nivel > 0 ? viewerStats.nivel : 1;
@@ -38,7 +41,7 @@ export default function PerfilPage({ currentUserEmail, currentUserName }) {
   let puntosFaltantes = 0;
   let siguienteNivelNumero = null;
 
-  if (registroSiguiente) {
+  if (registroActual && registroSiguiente) {
     const base = registroActual.puntos_requeridos;
     const objetivo = registroSiguiente.puntos_requeridos;
     const rango = Math.max(objetivo - base, 1);
@@ -47,7 +50,7 @@ export default function PerfilPage({ currentUserEmail, currentUserName }) {
     porcentaje = Math.min((progresoNivel / rango) * 100, 100);
     puntosFaltantes = Math.max(objetivo - puntosActuales, 0);
     siguienteNivelNumero = registroSiguiente.nivel;
-  } else {
+  } else if (registroActual && !registroSiguiente) {
     porcentaje = 100;
     puntosFaltantes = 0;
   }

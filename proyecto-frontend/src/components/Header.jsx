@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
-import viewerLevelsData from "../data/viewerLevels.json";
 
 export default function Header({
   isLoggedIn,
@@ -18,16 +17,25 @@ export default function Header({
     puntos: 0,
   });
 
+  const [viewerLevels, setViewerLevels] = useState([]);
+
   const navigate = useNavigate();
 
   const statsKey = currentUserEmail
     ? `viewerStats_${currentUserEmail}`
     : "viewerStats";
 
-  // Nombre que se mostrará en el modal de perfil
   const nombreMostrar = currentUserName || currentUserEmail || "Viewer";
 
-  // Cuando se abre el modal, leemos los stats actuales del viewer
+  // Cargar niveles desde backend
+  useEffect(() => {
+    fetch("http://localhost:3001/api/viewer-levels")
+      .then((res) => res.json())
+      .then((data) => setViewerLevels(data))
+      .catch((err) => console.error("Error cargando viewerLevels:", err));
+  }, []);
+
+
   const abrirPerfil = () => {
     if (userRole === "viewer") {
       try {
@@ -41,23 +49,22 @@ export default function Header({
     setPerfilVisible(true);
   };
 
-  // ----- Cálculo de nivel y barra SOLO para viewer -----
+  // Cálculo de nivel y barra SOLO para viewer
   let nivelMostrar = 1;
   let puntosMostrar = 0;
   let porcentaje = 0;
   let puntosFaltantes = 0;
   let siguienteNivelNumero = null;
 
-  if (userRole === "viewer") {
+  if (userRole === "viewer" && viewerLevels.length > 0) {
     const nivelActual =
       viewerStats.nivel && viewerStats.nivel > 0 ? viewerStats.nivel : 1;
     const puntosActuales = viewerStats.puntos || 0;
 
     const registroActual =
-      viewerLevelsData.find((l) => l.nivel === nivelActual) ||
-      viewerLevelsData[0];
+      viewerLevels.find((l) => l.nivel === nivelActual) || viewerLevels[0];
 
-    const registroSiguiente = viewerLevelsData.find(
+    const registroSiguiente = viewerLevels.find(
       (l) => l.nivel === nivelActual + 1
     );
 
@@ -65,8 +72,8 @@ export default function Header({
     puntosMostrar = puntosActuales;
 
     if (registroSiguiente) {
-      const base = registroActual.puntos_requeridos; // puntos al inicio de este nivel
-      const objetivo = registroSiguiente.puntos_requeridos; // puntos para el sig. nivel
+      const base = registroActual.puntos_requeridos;
+      const objetivo = registroSiguiente.puntos_requeridos;
       const rango = Math.max(objetivo - base, 1);
       const progresoNivel = Math.max(puntosActuales - base, 0);
 
@@ -74,7 +81,6 @@ export default function Header({
       puntosFaltantes = Math.max(objetivo - puntosActuales, 0);
       siguienteNivelNumero = registroSiguiente.nivel;
     } else {
-      // No hay siguiente nivel: estás al máximo
       porcentaje = 100;
       puntosFaltantes = 0;
       siguienteNivelNumero = null;
@@ -83,7 +89,6 @@ export default function Header({
 
   return (
     <header className="main-header">
-      {/* Logo que lleva al home */}
       <h1
         className="logo"
         style={{ cursor: "pointer" }}
@@ -99,7 +104,6 @@ export default function Header({
 
         {isLoggedIn ? (
           <>
-            {/* Botón monedas */}
             <button
               className="btn-monedas"
               onClick={() => navigate("/comprar")}
@@ -107,7 +111,6 @@ export default function Header({
               🪙 {monedas}
             </button>
 
-            {/* Botón perfil */}
             <button className="btn-perfil" onClick={abrirPerfil}>
               👤
             </button>
@@ -119,11 +122,9 @@ export default function Header({
         )}
       </nav>
 
-      {/* MODAL DE PERFIL */}
       {perfilVisible && (
         <div className="perfil-modal">
           <div className="perfil-contenido">
-            {/* X arriba a la derecha */}
             <button
               className="cerrar-modal"
               onClick={() => setPerfilVisible(false)}
@@ -164,7 +165,6 @@ export default function Header({
                   Progreso hacia el siguiente nivel: {porcentaje.toFixed(1)}%
                 </p>
 
-                {/* Cerrar sesión (viewer) */}
                 <button
                   className="cerrar-perfil"
                   onClick={() => {

@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
-import regalosData from "../data/regalos.json";
 import "./Regalos.css";
 
 export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
   const [regaloSeleccionado, setRegaloSeleccionado] = useState(null);
-  const [regalos, setRegalos] = useState(regalosData);
-  const [mensajeEnvio, setMensajeEnvio] = useState(""); // 👈 nuevo estado
+  const [regalos, setRegalos] = useState([]);
+  const [mensajeEnvio, setMensajeEnvio] = useState("");
 
   useEffect(() => {
-    const guardados = localStorage.getItem("regalos");
-    if (guardados) {
-      setRegalos(JSON.parse(guardados));
-    }
+    fetch("http://localhost:3001/api/regalos")
+      .then((res) => res.json())
+      .then((data) => setRegalos(data))
+      .catch((err) => console.error("Error cargando regalos:", err));
   }, []);
 
   const handleEnviar = () => {
@@ -28,8 +27,6 @@ export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
     }
 
     onEnviarRegalo(regaloSeleccionado);
-
-    // 👇 en vez de alert(), mostramos un mensajito dentro del panel
     setMensajeEnvio(`¡Has enviado ${regaloSeleccionado.nombre}! 🎁`);
     setRegaloSeleccionado(null);
 
@@ -41,7 +38,6 @@ export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
   return (
     <div className="regalos-overlay">
       <div className="regalos-container">
-        {/* Botón cerrar arriba a la derecha */}
         <button className="btn-cerrar" onClick={onClose}>
           ✖
         </button>
@@ -65,7 +61,6 @@ export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
           ))}
         </div>
 
-        {/* Mensaje de envío / error suave */}
         {mensajeEnvio && <div className="regalo-toast">{mensajeEnvio}</div>}
 
         <button className="btn-enviar" onClick={handleEnviar}>

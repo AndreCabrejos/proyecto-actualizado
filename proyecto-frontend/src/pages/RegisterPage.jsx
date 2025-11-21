@@ -14,7 +14,6 @@ export default function RegisterPage() {
     password: "",
   });
 
-  // 👇 nuevo: para mostrar el mensaje de éxito
   const [showSuccess, setShowSuccess] = useState(false);
 
   const navigate = useNavigate();
@@ -51,46 +50,46 @@ export default function RegisterPage() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validar()) return;
 
-    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-    const emailNormalizado = email.trim().toLowerCase();
+    try {
+      const body = {
+        username: username.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        role,
+      };
 
-    const yaExiste = usuarios.some((u) => u.email === emailNormalizado);
-    if (yaExiste) {
-      setErrors((prev) => ({
-        ...prev,
-        email: "Ya existe una cuenta registrada con ese correo.",
-      }));
-      return;
+      const resp = await fetch("http://localhost:3001/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        setErrors((prev) => ({
+          ...prev,
+          email: data.message || "Error al registrarse",
+        }));
+        return;
+      }
+
+      setShowSuccess(true);
+    } catch (err) {
+      console.error(err);
+      alert("Error al conectar con el servidor");
     }
-
-    const nuevoUsuario = {
-      username: username.trim(),
-      email: emailNormalizado,
-      password,
-      role,
-      monedas: 0,
-    };
-
-    const actualizados = [...usuarios, nuevoUsuario];
-    localStorage.setItem("usuarios", JSON.stringify(actualizados));
-
-    // 👇 mostramos el mensaje bonito de éxito
-    setShowSuccess(true);
   };
 
-  // Cuando el usuario hace clic en "Aceptar"
   const handleSuccessAccept = () => {
     const tipo = role === "streamer" ? "de streamer" : "de espectador";
-
-    // Solo por si quieres usarlo después, pero lo importante es redirigir:
     console.log(`Cuenta ${tipo} creada correctamente`);
 
-    // volvemos al home y abrimos el login
     navigate("/");
     window.dispatchEvent(new Event("openLoginModal"));
   };
@@ -109,7 +108,6 @@ export default function RegisterPage() {
         <h2>Crear cuenta</h2>
 
         <form onSubmit={handleSubmit} noValidate>
-          {/* USERNAME */}
           <input
             type="text"
             placeholder="Nombre de usuario"
@@ -124,7 +122,6 @@ export default function RegisterPage() {
             <p className="error-text">{errors.username}</p>
           )}
 
-          {/* EMAIL */}
           <input
             type="email"
             placeholder="Correo electrónico"
@@ -137,7 +134,6 @@ export default function RegisterPage() {
           />
           {errors.email && <p className="error-text">{errors.email}</p>}
 
-          {/* PASSWORD */}
           <input
             type="password"
             placeholder="Contraseña"
@@ -152,7 +148,6 @@ export default function RegisterPage() {
             <p className="error-text">{errors.password}</p>
           )}
 
-          {/* ROLE */}
           <select value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="viewer">Espectador</option>
             <option value="streamer">Streamer</option>
@@ -161,7 +156,6 @@ export default function RegisterPage() {
           <button type="submit">Registrarme</button>
         </form>
 
-        {/* ✅ Mensaje de éxito personalizado */}
         {showSuccess && (
           <div className="success-overlay">
             <div className="success-box">

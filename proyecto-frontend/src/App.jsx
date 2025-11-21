@@ -46,95 +46,50 @@ export default function App() {
 
   const [showLogin, setShowLogin] = useState(false);
 
-  const handleLogin = (email, password) => {
-    // DEMO streamer
-    if (email === "streamer@streamoria.com" && password === "1234") {
-      const demoStreamer = {
-        email,
-        username: "StreamerDemo",
-        role: "streamer",
-        monedas: 0,
-      };
+  // 🔐 LOGIN usando backend
+  const handleLogin = async (email, password) => {
+    try {
+      const resp = await fetch("http://localhost:3001/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        alert(data.message || "Error al iniciar sesión");
+        return;
+      }
+
+      // guardar datos del usuario y token
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("currentUser", JSON.stringify(data.user));
 
       setIsLoggedIn(true);
-      setUserRole("streamer");
-      setShowLogin(false);
-      setMonedas(0);
-      setCurrentUserEmail(email);
-      setCurrentUser(demoStreamer);
-      localStorage.setItem("currentUser", JSON.stringify(demoStreamer));
+      setUserRole(data.user.role);
+      setCurrentUserEmail(data.user.email);
+      setMonedas(data.user.monedas ?? 0);
+      setCurrentUser(data.user);
 
-      navigate("/streamer");
-      return;
-    }
-
-    // DEMO viewer
-    if (email === "viewer@streamoria.com" && password === "1234") {
-      const demoViewer = {
-        email,
-        username: "ViewerDemo",
-        role: "viewer",
-        monedas: 0,
-      };
-
-      setIsLoggedIn(true);
-      setUserRole("viewer");
-      setShowLogin(false);
-      setMonedas(0);
-      setCurrentUserEmail(email);
-      setCurrentUser(demoViewer);
-      localStorage.setItem("currentUser", JSON.stringify(demoViewer));
-
-      navigate("/viewer/ryuplayer");
-      return;
-    }
-
-    // Usuarios registrados
-    const registrados = JSON.parse(localStorage.getItem("usuarios") || "[]");
-    const emailNormalizado = email.trim().toLowerCase();
-
-    const encontrado = registrados.find(
-      (u) => u.email === emailNormalizado && u.password === password
-    );
-
-    if (encontrado) {
-      setIsLoggedIn(true);
-      setUserRole(encontrado.role);
-      setShowLogin(false);
-      setMonedas(encontrado.monedas ?? 0);
-      setCurrentUserEmail(encontrado.email);
-      setCurrentUser(encontrado);
-      localStorage.setItem("currentUser", JSON.stringify(encontrado));
-
-      if (encontrado.role === "streamer") {
+      // redirección según tipo de usuario
+      if (data.user.role === "streamer") {
         navigate("/streamer");
       } else {
         navigate("/viewer/ryuplayer");
       }
-    } else {
-      alert("Correo o contraseña incorrectos");
+    } catch (err) {
+      console.error(err);
+      alert("No se pudo conectar con el servidor");
     }
   };
 
-  // ✅ Sincronizar monedas con localStorage SIN bucle infinito
+  // 🪙 Cuando cambian las monedas, solo actualizamos currentUser en localStorage
   useEffect(() => {
-    if (!currentUserEmail) return;
-
-    // actualizar lista de usuarios
-    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-    const actualizados = usuarios.map((u) =>
-      u.email === currentUserEmail ? { ...u, monedas } : u
-    );
-    localStorage.setItem("usuarios", JSON.stringify(actualizados));
-
-    // actualizar currentUser y localStorage/currentUser
-    setCurrentUser((prev) => {
-      if (!prev) return prev;
-      const actualizado = { ...prev, monedas };
-      localStorage.setItem("currentUser", JSON.stringify(actualizado));
-      return actualizado;
-    });
-  }, [monedas, currentUserEmail]); // 👈 ya NO depende de currentUser
+    if (!currentUser) return;
+    const actualizado = { ...currentUser, monedas };
+    localStorage.setItem("currentUser", JSON.stringify(actualizado));
+  }, [monedas, currentUser]);
 
   // Evento global para abrir login después del registro
   useEffect(() => {
@@ -150,6 +105,7 @@ export default function App() {
     setMonedas(0);
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
+    localStorage.removeItem("token");
     navigate("/");
   };
 
@@ -211,8 +167,6 @@ export default function App() {
                   setMonedas={setMonedas}
                   currentUserEmail={currentUser?.email || null}
                   currentUserName={currentUser?.username || null}
-                  isLoggedIn={isLoggedIn}
-                  userRole={userRole}
                 />
               ) : (
                 <Navigate to="/" replace />
