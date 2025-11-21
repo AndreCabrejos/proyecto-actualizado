@@ -1,0 +1,30 @@
+@media (max-width: 600px) and (orientation: portrait) {
+
+  header,
+  footer,
+  main,
+  section {
+    padding: 1rem;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .modal {
+    width: 90%;
+  }
+}

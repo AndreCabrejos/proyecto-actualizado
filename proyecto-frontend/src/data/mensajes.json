@@ -1,0 +1,7 @@
+[
+  { "id": 1, "usuario": "usuario1", "texto": "¡Hola!", "nivel": 2 },
+  { "id": 2, "usuario": "usuario2", "texto": "Buen stream 🔥", "nivel": 4 },
+  { "id": 3, "usuario": "usuario3", "texto": "jajaja 😂", "nivel": 1 },
+  { "id": 4, "usuario": "usuario4", "texto": "Saludos desde Perú 🇵🇪", "nivel": 3 },
+  { "id": 5, "usuario": "usuario5", "texto": "Me encanta este canal 💜", "nivel": 5 }
+]

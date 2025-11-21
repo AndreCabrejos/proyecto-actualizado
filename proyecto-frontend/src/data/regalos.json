@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nombre": "Like",
+    "costo": 10,
+    "puntos": 5,
+    "icono": "👍"
+  },
+  {
+    "id": 2,
+    "nombre": "Corazón",
+    "costo": 20,
+    "puntos": 10,
+    "icono": "❤️"
+  },
+  {
+    "id": 3,
+    "nombre": "Aplausos",
+    "costo": 30,
+    "puntos": 15,
+    "icono": "👏"
+  },
+  {
+    "id": 4,
+    "nombre": "Estrella",
+    "costo": 50,
+    "puntos": 25,
+    "icono": "⭐"
+  }
+]
