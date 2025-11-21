@@ -17,7 +17,11 @@ exports.register = async (req, res) => {
 
     const safe = { id: user.id, nombre: user.nombre, email: user.email, role: user.role };
 
-    const token = jwt.sign({ id: user.id, role: user.role, nombre: user.nombre }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign(
+      { id: user.id, role: user.role, nombre: user.nombre },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     return res.json({ message: 'Usuario registrado', user: safe, token });
   } catch (err) {
@@ -35,7 +39,11 @@ exports.login = async (req, res) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(400).json({ error: 'Contraseña incorrecta' });
 
-    const token = jwt.sign({ id: user.id, role: user.role, nombre: user.nombre }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign(
+      { id: user.id, role: user.role, nombre: user.nombre },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     return res.json({
       message: 'Login correcto',
