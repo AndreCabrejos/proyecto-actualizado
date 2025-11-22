@@ -72,6 +72,9 @@ export default function App() {
       setMonedas(data.user.monedas ?? 0);
       setCurrentUser(data.user);
 
+      // 👇👇 cerrar el modal de login aquí
+      setShowLogin(false);
+
       // redirección según tipo de usuario
       if (data.user.role === "streamer") {
         navigate("/streamer");
@@ -83,6 +86,7 @@ export default function App() {
       alert("No se pudo conectar con el servidor");
     }
   };
+
 
   // 🪙 Cuando cambian las monedas, solo actualizamos currentUser en localStorage
   useEffect(() => {
