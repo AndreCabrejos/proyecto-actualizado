@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const channelController = require("../controllers/channelController");
+const { authRequired, allowRoles } = require("../middlewares/authMiddleware");
 
-// Obtener todos los canales
 router.get("/", channelController.getAll);
-
-// Obtener canal por ID
 router.get("/:id", channelController.getById);
+
+router.post("/", authRequired, allowRoles("streamer"), channelController.create);
+router.put("/:id", authRequired, allowRoles("streamer"), channelController.update);
+router.delete("/:id", authRequired, allowRoles("streamer"), channelController.delete);
 
 module.exports = router;

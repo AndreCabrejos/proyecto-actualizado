@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-
+require('dotenv').config();
 const app = require('../app');
 const debug = require('debug')('protectoweb-back:server');
 const http = require('http');
-
-// IMPORTACIÓN CORRECTA DE SEQUELIZE
 const db = require('../db/models');
 const sequelize = db.sequelize;
 
@@ -15,14 +13,16 @@ const server = http.createServer(app);
 
 (async () => {
   try {
-
-    if (!sequelize) {
-      throw new Error("❌ 'sequelize' es undefined. Revisa db/models/index.js");
-    }
-
+    if (!sequelize) throw new Error("❌ 'sequelize' es undefined. Revisa db/models/index.js");
     await sequelize.authenticate();
-    // await sequelize.sync(); // OPCIONAL
     console.log("📦 Base de datos conectada correctamente");
+
+    // Inicializar socket.io
+    const ioInit = require("../sockets/io");
+    const io = ioInit.init(server);
+
+    // inicializar handlers
+    require("../sockets/index")(io);
 
     server.listen(port, () => {
       console.log(`🚀 Servidor escuchando en el puerto ${port}`);
@@ -43,7 +43,6 @@ function normalizePort(val) {
   if (p >= 0) return p;
   return false;
 }
-
 function onError(error) {
   if (error.syscall !== 'listen') throw error;
   const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
@@ -58,7 +57,6 @@ function onError(error) {
       throw error;
   }
 }
-
 function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;

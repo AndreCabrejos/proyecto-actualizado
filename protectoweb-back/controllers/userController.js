@@ -1,13 +1,15 @@
-// controllers/userController.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User } = require("../db/models");
+const { User, ViewerStat } = require("../db/models");
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
 exports.register = async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: "username, email y password obligatorios" });
+        }
 
         const existing = await User.findOne({ where: { email } });
         if (existing) {
@@ -21,15 +23,29 @@ exports.register = async (req, res) => {
             email,
             password: hash,
             role: role || "viewer",
-            monedas: 0,
+            monedas: role === "viewer" ? 500 : 0,
         });
 
+        // crear stats inicial si es viewer
+        if (user.role === "viewer") {
+          await ViewerStat.create({ userId: user.id, nivel: 1, puntos: 0 });
+        }
+
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
         res.status(201).json({
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            role: user.role,
-            monedas: user.monedas,
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                monedas: user.monedas,
+            },
         });
     } catch (err) {
         console.error(err);
@@ -41,6 +57,8 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password) return res.status(400).json({ message: "Email y contraseña requeridos" });
+
         const user = await User.findOne({ where: { email } });
         if (!user) return res.status(400).json({ message: "Credenciales inválidas" });
 
@@ -50,7 +68,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
             JWT_SECRET,
-            { expiresIn: "2h" }
+            { expiresIn: "7d" }
         );
 
         res.json({

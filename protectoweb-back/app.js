@@ -1,16 +1,28 @@
-// app.js
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const cors = require('cors');
+const helmet = require('helmet');
 
 const apiRouter = require('./routes/api');
 
 const app = express();
 
-// ✅ Permitir tanto 5173 como 3000 (Vite o CRA)
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.FRONTEND_URL
+];
+
+app.use(helmet());
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("CORS not allowed"));
+  },
   credentials: true,
 }));
 
@@ -24,5 +36,12 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', apiRouter);
+
+// error handler
+app.use((err, req, res, next) => {
+  console.error("Server error:", err?.stack || err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: "Error interno del servidor" });
+});
 
 module.exports = app;
