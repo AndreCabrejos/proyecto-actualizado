@@ -1,0 +1,53 @@
+// src/components/Regalos.jsx
+import React, { useState } from "react";
+import regalosData from "../data/regalos.json";
+import "./Regalos.css";
+
+export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
+  const [regaloSeleccionado, setRegaloSeleccionado] = useState(null);
+
+  const handleEnviar = async () => {
+    if (!regaloSeleccionado)
+      return alert("Selecciona un regalo primero.");
+
+    if (monedas < regaloSeleccionado.costo)
+      return alert("No tienes suficientes monedas.");
+
+    // 🔥 pasar al padre, quien llamará al backend
+    await onEnviarRegalo(regaloSeleccionado);
+
+    setRegaloSeleccionado(null);
+  };
+
+  return (
+    <div className="regalos-overlay">
+      <div className="regalos-container">
+        <button className="btn-cerrar" onClick={onClose}>✖</button>
+
+        <h2>🎁 Enviar un regalo</h2>
+        <p>Monedas disponibles: {monedas} 💰</p>
+
+        <div className="lista-regalos">
+          {regalosData.map((r) => (
+            <div
+              key={r.id}
+              className={`regalo ${
+                regaloSeleccionado?.id === r.id ? "seleccionado" : ""
+              }`}
+              onClick={() => setRegaloSeleccionado(r)}
+            >
+              <span className="icono">{r.icono}</span>
+              <p>{r.nombre}</p>
+              <small>{r.costo} monedas</small>
+              <small>{r.puntos} pts</small>
+            </div>
+          ))}
+        </div>
+
+        <button className="btn-enviar" onClick={handleEnviar}>
+          Enviar regalo
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,67 @@
+.gift-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* No bloquea clics */
+  z-index: 9999;
+}
+
+.gift-card {
+  background: rgba(40, 40, 60, 0.9);
+  color: #fff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  animation: popInOut 4s ease-in-out forwards;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
+}
+
+.gift-emoji {
+  font-size: 3rem;
+  animation: bounce 1s infinite ease-in-out;
+}
+
+.gift-info h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #ffd700;
+}
+
+.gift-info p {
+  margin: 5px 0 0;
+  font-size: 1rem;
+  color: #aaa;
+}
+
+@keyframes popInOut {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}

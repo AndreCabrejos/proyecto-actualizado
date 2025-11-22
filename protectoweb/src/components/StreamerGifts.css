@@ -1,0 +1,80 @@
+.gift-manager {
+  background-color: #1a1a1a;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  max-width: 700px;
+  margin: auto;
+}
+
+.gift-title {
+  text-align: center;
+  color: #8b5cf6;
+  margin-bottom: 1rem;
+}
+
+.gift-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.gift-form input {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  color: white;
+  padding: 0.6rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  width: 120px;
+}
+
+.btn-agregar, .btn-guardar {
+  background-color: #8b5cf6;
+  border: none;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-agregar:hover, .btn-guardar:hover {
+  background-color: #7c3aed;
+}
+
+.gift-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.gift-item {
+  background: #2a2a2a;
+  border-radius: 6px;
+  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gift-item span {
+  margin: 0 0.4rem;
+}
+
+.gift-actions button {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.gift-actions button:hover {
+  color: #fff;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "proyectoweb",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start:all": "concurrently \"npm run dev-back\" \"npm run dev-front\"",
+    "dev-back": "cd protectoweb-back && nodemon ./bin/www",
+    "dev-front": "cd protectoweb && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

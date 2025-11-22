@@ -1,0 +1,142 @@
+/* --- Estilos del Componente de Compra --- */
+
+/* Contenedor externo para centrar la tarjeta */
+.comprar-monedas-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* Aumentamos la altura para centrar mejor el catálogo */
+    padding: 2rem;
+    background-color: #121212; 
+    color: #fff;
+    width: 100%;
+}
+
+/* Tarjeta principal de la tienda (más grande para el catálogo) */
+.comprar-monedas {
+    background-color: #1f1f2f; 
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 800px; /* Hacemos la tarjeta más ancha para la cuadrícula */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.comprar-monedas h2 {
+    color: #8b5cf6; 
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.comprar-monedas p {
+    color: #ccc;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+
+/* --- Estilos de Mensajes (manteniendo las clases) --- */
+
+.purchase-message {
+    padding: 0.7rem;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    transition: opacity 0.3s;
+}
+
+.purchase-message.success {
+    background-color: #22c55e40; 
+    color: #22c55e;
+    border: 1px solid #22c55e;
+}
+
+.purchase-message.error {
+    background-color: #ef444440; 
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+
+/* --- Estilos de Catálogo de Packs (Nuevos/Regenerados) --- */
+
+.packs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.pack-card {
+    background: #282838;
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+    border: 2px solid transparent;
+}
+
+.pack-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: #8b5cf6;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.pack-coins-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #ffcc00;
+}
+
+.pack-name {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #f5f5f5;
+    margin: 0.5rem 0;
+}
+
+.pack-coins {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffcc00; /* Dorado para las monedas */
+    margin: 0.5rem 0 0.2rem 0;
+}
+
+.pack-price {
+    font-size: 1.1rem;
+    color: #ccc;
+    margin: 0 0 1.5rem 0;
+    font-weight: 400;
+}
+
+.purchase-button {
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.05rem;
+    transition: background-color 0.2s ease, transform 0.1s;
+}
+
+.purchase-button:hover {
+    background-color: #15803d;
+    transform: translateY(-1px);
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .comprar-monedas {
+        padding: 1.5rem;
+    }
+    .packs-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .pack-coins {
+        font-size: 1.8rem;
+    }
+}

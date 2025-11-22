@@ -1,0 +1,104 @@
+.canales-lateral {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.canales-lateral h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #ddd;
+}
+
+.lista-canales {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.canal-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+
+
+.canal-item:hover {
+    background-color: #2a2a2a;
+}
+
+.canal-logo {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.canal-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+}
+
+.canal-nombre {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+.canal-categoria {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin: 2px 0 0 0;
+}
+
+/* 🔴 Viewers */
+.canal-viewers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.punto-rojo {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: red;
+}
+
+.numero-viewers {
+    font-size: 0.8rem;
+    color: #fff;
+}
+
+/* CanalesRecomendados.css */
+.canal-item-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    padding: 6px 4px;
+    color: inherit;
+}
+
+.canal-item-btn:hover {
+    background-color: #262626;
+    border-radius: 6px;
+}
