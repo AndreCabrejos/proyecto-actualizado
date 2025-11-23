@@ -1,6 +1,6 @@
-// src/pages/RegisterPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authAPI } from "../services/api";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -63,26 +63,15 @@ export default function RegisterPage() {
         role,
       };
 
-      const resp = await fetch("http://localhost:3001/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await resp.json();
-
-      if (!resp.ok) {
-        setErrors((prev) => ({
-          ...prev,
-          email: data.message || "Error al registrarse",
-        }));
-        return;
-      }
-
+      await authAPI.registrar(body);
       setShowSuccess(true);
     } catch (err) {
       console.error(err);
-      alert("Error al conectar con el servidor");
+      const mensaje = err.response?.data?.message || "Error al conectar con el servidor";
+      setErrors((prev) => ({
+        ...prev,
+        email: mensaje,
+      }));
     }
   };
 

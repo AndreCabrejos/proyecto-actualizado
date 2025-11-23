@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { regalosAPI } from "../services/api";
 import "./Regalos.css";
 
 export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
@@ -7,10 +8,15 @@ export default function Regalos({ monedas, onEnviarRegalo, onClose }) {
   const [mensajeEnvio, setMensajeEnvio] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/regalos")
-      .then((res) => res.json())
-      .then((data) => setRegalos(data))
-      .catch((err) => console.error("Error cargando regalos:", err));
+    const cargarRegalos = async () => {
+      try {
+        const data = await regalosAPI.obtenerTodos();
+        setRegalos(data);
+      } catch (err) {
+        console.error("Error cargando regalos:", err);
+      }
+    };
+    cargarRegalos();
   }, []);
 
   const handleEnviar = () => {

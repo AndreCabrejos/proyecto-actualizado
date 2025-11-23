@@ -2,7 +2,7 @@ import "./ComprarMonedas.css";
 import { useState } from "react";
 import RecargarMonedasModal from "../components/RecargarMonedasModal";
 
-export default function ComprarMonedas({ monedas, setMonedas }) {
+export default function ComprarMonedas({ monedas, setMonedas, currentUser }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [packSeleccionado, setPackSeleccionado] = useState(null);
 
@@ -57,6 +57,7 @@ export default function ComprarMonedas({ monedas, setMonedas }) {
           setMonedas={setMonedas}
           onClose={cerrarModal}
           packSeleccionado={packSeleccionado}
+          currentUser={currentUser}
         />
       )}
     </section>
