@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useState, useEffect } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import Header from "./components/Header";
@@ -12,11 +11,11 @@ import ViewerPage from "./pages/ViewerPage";
 import RegisterPage from "./pages/RegisterPage";
 import ComprarMonedas from "./pages/ComprarMonedas";
 import PerfilPage from "./pages/PerfilPage";
+import { authAPI, guardarSesion, cerrarSesion } from "./services/api";
 
 export default function App() {
   const navigate = useNavigate();
 
-  // Usuario actual desde localStorage (una sola vez)
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem("currentUser");
     return saved ? JSON.parse(saved) : null;
@@ -36,7 +35,6 @@ export default function App() {
     return saved ? JSON.parse(saved).email : null;
   });
 
-  // Monedas
   const [monedas, setMonedas] = useState(() => {
     const saved = localStorage.getItem("currentUser");
     if (!saved) return 0;
@@ -46,25 +44,11 @@ export default function App() {
 
   const [showLogin, setShowLogin] = useState(false);
 
-  // 🔐 LOGIN usando backend
   const handleLogin = async (email, password) => {
     try {
-      const resp = await fetch("http://localhost:3001/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await authAPI.iniciarSesion(email, password);
 
-      const data = await resp.json();
-
-      if (!resp.ok) {
-        alert(data.message || "Error al iniciar sesión");
-        return;
-      }
-
-      // guardar datos del usuario y token
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("currentUser", JSON.stringify(data.user));
+      guardarSesion(data.token, data.user);
 
       setIsLoggedIn(true);
       setUserRole(data.user.role);
@@ -72,10 +56,8 @@ export default function App() {
       setMonedas(data.user.monedas ?? 0);
       setCurrentUser(data.user);
 
-      // 👇👇 cerrar el modal de login aquí
       setShowLogin(false);
 
-      // redirección según tipo de usuario
       if (data.user.role === "streamer") {
         navigate("/streamer");
       } else {
@@ -83,19 +65,17 @@ export default function App() {
       }
     } catch (err) {
       console.error(err);
-      alert("No se pudo conectar con el servidor");
+      const mensaje = err.response?.data?.message || "No se pudo conectar con el servidor";
+      alert(mensaje);
     }
   };
 
-
-  // 🪙 Cuando cambian las monedas, solo actualizamos currentUser en localStorage
   useEffect(() => {
     if (!currentUser) return;
     const actualizado = { ...currentUser, monedas };
     localStorage.setItem("currentUser", JSON.stringify(actualizado));
   }, [monedas, currentUser]);
 
-  // Evento global para abrir login después del registro
   useEffect(() => {
     const handler = () => setShowLogin(true);
     window.addEventListener("openLoginModal", handler);
@@ -108,8 +88,7 @@ export default function App() {
     setCurrentUserEmail(null);
     setMonedas(0);
     setCurrentUser(null);
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("token");
+    cerrarSesion();
     navigate("/");
   };
 
@@ -127,7 +106,6 @@ export default function App() {
 
       <main>
         <Routes>
-          {/* HOME */}
           <Route
             path="/"
             element={<Home isLoggedIn={isLoggedIn} userRole={userRole} />}
@@ -142,14 +120,17 @@ export default function App() {
             path="/comprar"
             element={
               isLoggedIn ? (
-                <ComprarMonedas monedas={monedas} setMonedas={setMonedas} />
+                <ComprarMonedas 
+                  monedas={monedas} 
+                  setMonedas={setMonedas}
+                  currentUser={currentUser}
+                />
               ) : (
                 <Navigate to="/" replace />
               )
             }
           />
 
-          {/* STREAMER */}
           <Route
             path="/streamer/*"
             element={
@@ -161,7 +142,6 @@ export default function App() {
             }
           />
 
-          {/* VIEWER */}
           <Route
             path="/viewer/:canal"
             element={
@@ -169,8 +149,10 @@ export default function App() {
                 <ViewerPage
                   monedas={monedas}
                   setMonedas={setMonedas}
+                  currentUser={currentUser}
                   currentUserEmail={currentUser?.email || null}
                   currentUserName={currentUser?.username || null}
+                  currentUserId={currentUser?.id || null}
                 />
               ) : (
                 <Navigate to="/" replace />
@@ -178,12 +160,12 @@ export default function App() {
             }
           />
 
-          {/* PERFIL */}
           <Route
             path="/perfil"
             element={
               isLoggedIn ? (
                 <PerfilPage
+                  currentUser={currentUser}
                   currentUserEmail={currentUser?.email || null}
                   currentUserName={currentUser?.username || null}
                 />

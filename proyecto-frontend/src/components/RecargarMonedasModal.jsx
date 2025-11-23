@@ -1,5 +1,6 @@
 // RecargarMonedasModal.jsx
 import { useState } from "react";
+import { monedasAPI } from "../services/api";
 import "./RecargarMonedasModal.css";
 
 import visa from "../assets/visa.svg";
@@ -12,6 +13,7 @@ export default function RecargarMonedasModal({
   setMonedas,
   onClose,
   packSeleccionado = null,
+  currentUser = null,
 }) {
   // Si viene de un pack, precargamos las monedas del pack
   const [monto, setMonto] = useState(
@@ -31,7 +33,7 @@ export default function RecargarMonedasModal({
       ? Number(monto)
       : 0;
 
-  const simularPago = (e) => {
+  const simularPago = async (e) => {
     e.preventDefault();
 
     const monedasARecargar = packSeleccionado
@@ -43,27 +45,50 @@ export default function RecargarMonedasModal({
       return;
     }
 
+    if (!currentUser || !currentUser.id) {
+      alert("Error: No hay usuario autenticado.");
+      return;
+    }
+
     setCargando(true);
 
-    setTimeout(() => {
-      const id = "TXN" + Date.now();
-      const saldoAnterior = monedas;
+    try {
+      // Actualizar monedas en el backend
+      await monedasAPI.actualizarMonedas(currentUser.id, monedasARecargar);
 
-      const nueva = {
-        id,
-        monedas: monedasARecargar,
-        precio: precioActual, // S/
-        fecha: new Date().toLocaleString(),
-        ultimos4: String(tarjeta).slice(-4) || "0000",
-        brand: cardBrand,
-        saldoAnterior,
-        packName: packSeleccionado ? packSeleccionado.name : "Recarga manual",
-      };
+      // Simular delay para efecto visual
+      setTimeout(() => {
+        const id = "TXN" + Date.now();
+        const saldoAnterior = monedas;
 
-      setTransaccion(nueva);
-      setMonedas((prev) => prev + monedasARecargar);
+        const nueva = {
+          id,
+          monedas: monedasARecargar,
+          precio: precioActual, // S/
+          fecha: new Date().toLocaleString(),
+          ultimos4: String(tarjeta).slice(-4) || "0000",
+          brand: cardBrand,
+          saldoAnterior,
+          packName: packSeleccionado ? packSeleccionado.name : "Recarga manual",
+        };
+
+        setTransaccion(nueva);
+        setMonedas((prev) => prev + monedasARecargar);
+
+        // Actualizar localStorage
+        const usuarioActualizado = {
+          ...currentUser,
+          monedas: monedas + monedasARecargar,
+        };
+        localStorage.setItem("currentUser", JSON.stringify(usuarioActualizado));
+
+        setCargando(false);
+      }, 2000);
+    } catch (err) {
+      console.error("Error al actualizar monedas:", err);
+      alert("Error al procesar el pago. Por favor intenta de nuevo.");
       setCargando(false);
-    }, 2000);
+    }
   };
 
   return (

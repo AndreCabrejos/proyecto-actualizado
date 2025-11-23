@@ -1,20 +1,23 @@
 'use strict';
-const { Model } = require('sequelize');
+const {
+  Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Gift extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
     static associate(models) {
-      Gift.belongsTo(models.User, { foreignKey: 'streamerId', as: 'owner' });
-      Gift.belongsTo(models.Channel, { foreignKey: 'channelId' });
-      Gift.hasMany(models.GiftHistory, { foreignKey: 'giftId' });
+      // define association here
     }
   }
   Gift.init({
     nombre: DataTypes.STRING,
     costo: DataTypes.INTEGER,
     puntos: DataTypes.INTEGER,
-    icono: DataTypes.STRING,
-    streamerId: DataTypes.INTEGER,
-    channelId: DataTypes.INTEGER
+    icono: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Gift',

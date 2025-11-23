@@ -6,15 +6,25 @@ export default function GiftManager() {
   const [regalos, setRegalos] = useState([]);
   const [nuevoRegalo, setNuevoRegalo] = useState({ nombre: '', costo: '', puntos: '', icono: '' });
   const [editando, setEditando] = useState(null);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState(null);
 
 
   useEffect(() => {
-    const guardados = localStorage.getItem('regalos');
-    if (guardados) {
-      setRegalos(JSON.parse(guardados));
-    } else {
-      setRegalos(regalosData);
-      localStorage.setItem('regalos', JSON.stringify(regalosData));
+    setCargando(true);
+    try {
+      const guardados = localStorage.getItem('regalos');
+      if (guardados) {
+        setRegalos(JSON.parse(guardados));
+      } else {
+        setRegalos(regalosData);
+        localStorage.setItem('regalos', JSON.stringify(regalosData));
+      }
+    } catch (err) {
+      console.error('Error cargando regalos desde localStorage:', err);
+      setError('No se pudieron cargar los regalos');
+    } finally {
+      setCargando(false);
     }
   }, []);
 

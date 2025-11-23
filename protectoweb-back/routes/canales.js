@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const channelController = require("../controllers/channelController");
-const { authRequired, allowRoles } = require("../middlewares/authMiddleware");
+const { authRequired } = require("../middlewares/authMiddleware");
 
+// Públicas
 router.get("/", channelController.getAll);
 router.get("/:id", channelController.getById);
 
-router.post("/", authRequired, allowRoles("streamer"), channelController.create);
-router.put("/:id", authRequired, allowRoles("streamer"), channelController.update);
-router.delete("/:id", authRequired, allowRoles("streamer"), channelController.delete);
+// Privadas (Requieren Login)
+router.post("/", authRequired, channelController.createOrUpdateChannel);
+router.get("/me/data", authRequired, channelController.getMyChannel); // Ruta específica para 'mi canal'
 
 module.exports = router;

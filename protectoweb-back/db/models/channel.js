@@ -1,22 +1,31 @@
 'use strict';
-const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Channel extends Model {
-    static associate(models) {
-      Channel.belongsTo(models.User, { foreignKey: 'streamerId', as: 'streamer' });
-      Channel.hasMany(models.Gift, { foreignKey: 'channelId' });
-      Channel.hasMany(models.GiftHistory, { foreignKey: 'channelId' });
+  const Channel = sequelize.define('Channel', {
+    nombre: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    categoria: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    imagen: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    viewers: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
-  }
-  Channel.init({
-    nombre: DataTypes.STRING,
-    categoria: DataTypes.STRING,
-    imagen: DataTypes.STRING,
-    viewers: { type: DataTypes.INTEGER, defaultValue: 0 },
-    streamerId: DataTypes.INTEGER
   }, {
-    sequelize,
-    modelName: 'Channel',
+    tableName: 'Channels',
+    timestamps: true
   });
+
+  Channel.associate = function(models) {
+    // Sin relación con User por ahora
+  };
+
   return Channel;
 };

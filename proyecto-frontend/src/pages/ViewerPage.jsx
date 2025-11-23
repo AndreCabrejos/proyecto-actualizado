@@ -6,11 +6,13 @@ import Regalos from "../components/Regalos";
 import Notificacion from "../components/Notificacion";
 import mensajesData from "../data/mensajes.json";
 import { emitGiftEvent } from "../services/streamEvents";
+import { canalesAPI, nivelesAPI, regalosAPI, monedasAPI } from "../services/api";
 import "./ViewerPage.css";
 
 export default function ViewerPage({
   monedas,
   setMonedas,
+  currentUser,
   currentUserEmail,
   currentUserName,
   currentUserId,
@@ -58,28 +60,35 @@ export default function ViewerPage({
 
   const [viewerLevels, setViewerLevels] = useState([]);
 
-  // cargar canales desde backend
+  // Cargar canales desde backend usando API
   useEffect(() => {
-    fetch("http://localhost:3001/api/canales")
-      .then((res) => res.json())
-      .then((data) => {
+    const cargarCanales = async () => {
+      try {
+        const data = await canalesAPI.obtenerTodos();
         setCanales(data);
         const encontrado =
           data.find(
             (c) => c.nombre.toLowerCase() === canal.toLowerCase()
           ) || data[0] || null;
         setCanalSeleccionado(encontrado);
-      })
-      .catch((err) => console.error("Error cargando canales:", err));
+      } catch (err) {
+        console.error("Error cargando canales:", err);
+      }
+    };
+    cargarCanales();
   }, [canal]);
 
-
-  // cargar niveles desde backend
+  // Cargar niveles desde backend usando API
   useEffect(() => {
-    fetch("http://localhost:3001/api/viewer-levels")
-      .then((res) => res.json())
-      .then((data) => setViewerLevels(data))
-      .catch((err) => console.error("Error cargando viewerLevels:", err));
+    const cargarNiveles = async () => {
+      try {
+        const data = await nivelesAPI.obtenerTodos();
+        setViewerLevels(data);
+      } catch (err) {
+        console.error("Error cargando niveles:", err);
+      }
+    };
+    cargarNiveles();
   }, []);
 
 
@@ -139,26 +148,45 @@ export default function ViewerPage({
     );
   }, [nivel, puntos, statsKey, currentUserEmail]);
 
-  // enviar regalo: resta monedas (frontend + backend) y suma puntos
-  const handleEnviarRegalo = (regalo) => {
-    setMonedas((prev) => prev - regalo.costo);
-    setPuntos((prev) => prev + (regalo.puntos || 0));
-
-    // actualizar backend (monedas)
-    if (currentUserId) {
-      fetch(`http://localhost:3001/api/users/${currentUserId}/monedas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ delta: -regalo.costo }),
-      }).catch((err) => console.error("Error actualizando monedas:", err));
+  // Enviar regalo: actualizar backend y frontend
+  const handleEnviarRegalo = async (regalo) => {
+    if (!currentUserId) {
+      console.error("No hay usuario autenticado");
+      return;
     }
 
+    try {
+      // Enviar regalo al backend
+      const resultado = await regalosAPI.enviarRegalo({
+        viewerId: currentUserId,
+        channelId: canalSeleccionado?.id || null,
+        giftId: regalo.id,
+      });
 
-    emitGiftEvent({
-      canal: canalSeleccionado?.nombre || "",
-      user: displayName,
-      regalo,
-    });
+      // Actualizar estado local con los datos del backend
+      setMonedas(resultado.monedasRestantes);
+      setPuntos(resultado.puntosTotales);
+      setNivel(resultado.nivelActual);
+
+      // Actualizar localStorage
+      if (currentUser) {
+        const usuarioActualizado = {
+          ...currentUser,
+          monedas: resultado.monedasRestantes,
+        };
+        localStorage.setItem("currentUser", JSON.stringify(usuarioActualizado));
+      }
+
+      // Emitir evento para animación
+      emitGiftEvent({
+        canal: canalSeleccionado?.nombre || "",
+        user: displayName,
+        regalo,
+      });
+    } catch (err) {
+      console.error("Error enviando regalo:", err);
+      alert("Error al enviar el regalo. Por favor intenta de nuevo.");
+    }
   };
 
   // enviar mensaje: +1 punto
